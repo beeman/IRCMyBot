@@ -1,0 +1,28 @@
+{
+  "name": "IRCMyBot",
+  "version": "1.1.0",
+  "description": "A simple, yet powerful IRC bot built in Node.",
+  "main": "app.js",
+  "dependencies": {
+    "irc": "^0.3.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/matrixdevuk/IRCMyBot.git"
+  },
+  "keywords": [
+    "nodejs",
+    "irc",
+    "bot"
+  ],
+  "author": "matrixdevuk (https://the.matrixdevuk.pw/)",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/matrixdevuk/IRCMyBot/issues"
+  },
+  "homepage": "https://github.com/matrixdevuk/IRCMyBot"
+}
