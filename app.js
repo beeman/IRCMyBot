@@ -141,7 +141,9 @@ bot.addListener("message", function(nick, channel, message) {
 		
 		if (message == "!info")
 		{
-			bot.say(nick, "IRCMyBot • https://mduk.pw/IRCMyBot • Free NodeJS IRC Bot");
+			bot.say(nick, "Hello, I'm " + config.username + "!");
+			bot.say(nick, "I am powered by IRCMyBot, so I'm open source!");
+			bot.say(nick, "GitHub: https://mduk.pw/IRCMyBot • #IRCMyBot @ Freenode.net • Created by https://the.matrixdevuk.pw/");
 		}
 		
 		if (message == "!ping")
@@ -152,13 +154,6 @@ bot.addListener("message", function(nick, channel, message) {
 		if (message == "!count")
 		{
 			bot.say(channel, nick + ": There are " + Object.keys(allNames[channel]).length + " users in this channel.");
-		}
-		
-		if (message == "!info")
-		{
-			bot.say(nick, "Hello, I'm " + config.username + "!");
-			bot.say(nick, "I am powered by IRCMyBot, so I'm open source!");
-			bot.say(nick, "GitHub: https://mduk.pw/IRCMyBot • #IRCMyBot @ Freenode.net • Created by https://the.matrixdevuk.pw/");
 		}
 		
 		if (message == "!@" || message == "!ops")
