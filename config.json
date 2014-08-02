@@ -3,9 +3,8 @@
 	"server": "irc.freenode.net",
 	"sasl": false,
 	"username": "IRCMyBot",
-	"password": "your password here",
+	"password": "",
     "autoRejoin": true,
     "autoConnect": true,
-    "debug": false,
-    "userName": "IRCMyBot"
+    "debug": false
 }

@@ -4,6 +4,8 @@ var fs = require("fs");
 var http = require("http");
 var https = require("https");
 var config = fs.readFileSync("config.json");
+config.userName = "IRCMyBot";
+config.realName = "GitHub: https://mduk.pw/IRCMyBot";
 config = JSON.parse(config);
 var allNames = {};
 var powerOPS = fs.readFileSync("powerOPS.json");
@@ -109,9 +111,12 @@ bot.addListener("message", function(nick, channel, message) {
 				bot.say(nick, "!ping — Ping Pong.");
 				bot.say(nick, "!@ or !ops — Sends a message to all online OPs.");
 				bot.say(nick, "!b <nick> [reason] — Bans a user with an optional reason.");
+				bot.say(nick, "!hb <nick> [reason] — Bans a user's hostname with an optional reason.");
 				bot.say(nick, "!ub <nick> — Unbans a user.");
+				bot.say(nick, "!uhb <nick> — Unbans a user's hostname.");
 				bot.say(nick, "!q <nick> — Quiets a user.");
 				bot.say(nick, "!uq <nick> — Unquiets a user.");
+				bot.say(nick, "!k <nick> [reason] — Kicks a user from the channel.");
 			}else{
 				if (isVoice(nick, channel)) {
 					bot.say(nick, "Available Commands");
@@ -175,18 +180,130 @@ bot.addListener("message", function(nick, channel, message) {
 				{
 					var stripped_message = message.replace("!b ", "");
 					var name = stripped_message.split(" ")[0];
-					if (stripped_message.split(" ").length > 2)
+					if (name !== "")
 					{
-						var reason = stripped_message.replace(name + " ", "");
-						bot.send("MODE", channel, "+b", name);
-						bot.send("KICK", channel, name);
-						bot.say(name, "You have been banned from " + channel + " by " + nick);
-						bot.say(name, "Reason: " + reason);
+						if (stripped_message.split(" ").length > 2)
+						{
+							var reason = stripped_message.replace(name + " ", "");
+							bot.send("MODE", channel, "+b", name);
+							bot.send("KICK", channel, name);
+							bot.say(name, "You have been banned from " + channel + " by " + nick);
+							bot.say(name, "Reason: " + reason);
+						}else{
+							bot.send("MODE", channel, "+b", name);
+							bot.send("KICK", channel, name);
+							bot.say(name, "You have been banned from " + channel + " by " + nick);
+							bot.say(name, "No reason was specified.");
+						}
 					}else{
-						bot.send("MODE", channel, "+b", name);
-						bot.send("KICK", channel, name);
-						bot.say(name, "You have been banned from " + channel + " by " + nick);
-						bot.say(name, "No reason was specified.");
+						bot.say(channel, nick + ": Usage: !b <nick> [reason]");
+					}
+				}else{
+					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
+				}
+			}else{
+				bot.say(channel, nick + ": [ERROR] I couldn't complete that action because I need +o.");
+			}
+		}
+		
+		if (message.substr(0,3) == "!hb")
+		{
+			if (isOP(config.username, channel))
+			{
+				if (isOP(nick, channel))
+				{
+					var stripped_message = message.replace("!hb ", "");
+					var name = stripped_message.split(" ")[0];
+					if (name !== "")
+					{
+						var host;
+						bot.whois(name, function(whois) {
+							host = whois.host;
+							if (host !== "")
+							{
+								if (stripped_message.split(" ").length > 2)
+								{
+									var reason = stripped_message.replace(name + " ", "");
+									bot.send("MODE", channel, "+b", "*!*@" + host);
+									bot.send("KICK", channel, name);
+									bot.say(name, "You have been host banned from " + channel + " by " + nick);
+									bot.say(name, "Reason: " + reason);
+								}else{
+									bot.send("MODE", channel, "+b", "*!*@" + host);
+									bot.send("KICK", channel, name);
+									bot.say(name, "You have been host banned from " + channel + " by " + nick);
+									bot.say(name, "No reason was specified.");
+								}
+							}else{
+								bot.say(nick, nick + ": [ERROR] I couldn't retrieve the hostname of " + name + ".");
+							}
+						});
+					}else{
+						bot.say(channel, nick + ": Usage: !hb <nick> [reason]");
+					}
+				}else{
+					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
+				}
+			}else{
+				bot.say(channel, nick + ": [ERROR] I couldn't complete that action because I need +o.");
+			}
+		}
+		
+		if (message.substr(0,4) == "!uhb")
+		{
+			if (isOP(config.username, channel))
+			{
+				if (isOP(nick, channel))
+				{
+					var name = message.split(" ")[0];
+					if (name !== "")
+					{
+						var host;
+						bot.whois(name, function(whois) {
+							host = whois.host;
+							if (host !== "")
+							{
+								bot.send("MODE", channel, "-b", "*!*@" + host);
+								bot.send("KICK", channel, name);
+								bot.say(name, "You have been host banned from " + channel + " by " + nick);
+							}else{
+								bot.say(nick, nick + ": [ERROR] I couldn't retrieve the hostname of " + name + ".");
+							}
+						});
+					}else{
+						bot.say(channel, nick + ": Usage: !uhb <nick> [reason]");
+					}
+				}else{
+					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
+				}
+			}else{
+				bot.say(channel, nick + ": [ERROR] I couldn't complete that action because I need +o.");
+			}
+		}
+		
+		if (message.substr(0,2) == "!k")
+		{
+			if (isOP(config.username, channel))
+			{
+				if (isOP(nick, channel))
+				{
+					var stripped_message = message.replace("!k ", "");
+					var name = stripped_message.split(" ")[0];
+					if (name !== "")
+					{
+						if (stripped_message.split(" ").length > 2)
+						{
+							var reason = stripped_message.replace(name + " ", "");
+							bot.send("KICK", channel, name);
+							bot.say(name, "You have been kicked from " + channel + " by " + nick);
+							bot.say(name, "Reason: " + reason);
+						}else{
+							bot.send("KICK", channel, name);
+							bot.say(name, "You have been kicked from " + channel + " by " + nick);
+							bot.say(name, "No reason was specified.");
+						}
+					}else{
+						bot.say(channel, nick + ": Usage: !k <nick> [reason]");
 					}
 				}else{
 					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
@@ -203,8 +320,13 @@ bot.addListener("message", function(nick, channel, message) {
 				if (isOP(nick, channel))
 				{
 					var name = message.replace("!ub ", "");
-					bot.send("MODE", channel, "-b", name);
-					bot.say(name, "You have been unbanned from " + channel + " by " + nick);
+					if (name !== "")
+					{
+						bot.send("MODE", channel, "-b", name);
+						bot.say(name, "You have been unbanned from " + channel + " by " + nick);
+					}else{
+						bot.say(channel, nick + ": Usage: !ub <nick>");
+					}
 				}else{
 					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
 				}
@@ -221,16 +343,21 @@ bot.addListener("message", function(nick, channel, message) {
 				{
 					var stripped_message = message.replace("!q ", "");
 					var name = stripped_message.split(" ")[0];
-					if (stripped_message.split(" ").length > 2)
+					if (name !== "")
 					{
-						var reason = stripped_message.replace(name + " ", "");
-						bot.send("MODE", channel, "+q", name);
-						bot.say(name, "You have been silenced in " + channel + " by " + nick);
-						bot.say(name, "Reason: " + reason);
+						if (stripped_message.split(" ").length > 2)
+						{
+							var reason = stripped_message.replace(name + " ", "");
+							bot.send("MODE", channel, "+q", name);
+							bot.say(name, "You have been silenced in " + channel + " by " + nick);
+							bot.say(name, "Reason: " + reason);
+						}else{
+							bot.send("MODE", channel, "+q", name);
+							bot.say(name, "You have been silenced in " + channel + " by " + nick);
+							bot.say(name, "No reason was specified.");
+						}
 					}else{
-						bot.send("MODE", channel, "+q", name);
-						bot.say(name, "You have been silenced in " + channel + " by " + nick);
-						bot.say(name, "No reason was specified.");
+						bot.say(channel, nick + ": Usage: !q <nick> [reason]");
 					}
 				}else{
 					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
@@ -247,8 +374,13 @@ bot.addListener("message", function(nick, channel, message) {
 				if (isOP(nick, channel))
 				{
 					var name = message.replace("!uq ", "");
-					bot.send("MODE", channel, "-q", name);
-					bot.say(name, "You have been unsilenced in " + channel + " by " + nick);
+					if (name !== "")
+					{
+						bot.send("MODE", channel, "-q", name);
+						bot.say(name, "You have been unsilenced in " + channel + " by " + nick);
+					}else{
+						bot.say(channel, nick + ": Usage: !uq <nick>");
+					}
 				}else{
 					bot.say(channel, nick + ": Sorry! You must be OP to use that command.");
 				}
@@ -355,6 +487,13 @@ bot.addListener("pm", function(nick, message) {
 			}else{
 				bot.say(nick, "You must be identified with the services to complete this action.");
 			}
+		});
+	}
+	
+	if (message == "!whois!")
+	{
+		bot.whois(nick, function(whois) {
+			bot.say(nick, JSON.stringify(whois));
 		});
 	}
 });
