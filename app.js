@@ -139,6 +139,11 @@ bot.addListener("message", function(nick, channel, message) {
 			}
 		}
 		
+		if (message == "!info")
+		{
+			bot.say(nick, "IRCMyBot • https://mduk.pw/IRCMyBot • Free NodeJS IRC Bot");
+		}
+		
 		if (message == "!ping")
 		{
 			bot.say(channel, nick + ": PONG! (/^_^)/ \\(^_^\\)");
